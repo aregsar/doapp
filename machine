@@ -1,0 +1,143 @@
+
+https://www.digitalocean.com/community/tutorials/how-to-provision-and-manage-remote-docker-hosts-with-docker-machine-on-ubuntu-16-04
+
+https://docs.docker.com/machine/drivers/digital-ocean/#options
+
+https://developers.digitalocean.com/documentation/v2/
+
+
+#help
+docker-machine create --driver digitalocean -h
+
+#create droplet
+docker-machine create --driver digitalocean \
+ --digitalocean-access-token 2b15fab79eb17225c1b90cfa399b615a0a11b3dc2cf6d72aed911c452b550282 \
+ --digitalocean-image ubuntu-16-04-x64 \
+ --digitalocean-size 512mb \
+ --digitalocean-region sfo1 \
+ --digitalocean-private-networking \
+ --digitalocean-ipv6 \
+ --digitalocean-backups \
+ docker-server-1
+
+ #create droplet with defaults
+docker-machine create --driver digitalocean \
+--digitalocean-access-token 2b15fab79eb17225c1b90cfa399b615a0a11b3dc2cf6d72aed911c452b550282 \
+--digitalocean-region sfo1 \
+--digitalocean-private-networking \
+--digitalocean-ipv6 \
+docker-server-1
+
+#delete droplet
+docker-machine rm docker-server-1
+
+=================================================
+#
+#list exported vars
+docker-machine env machine-name
+
+#
+#switch to remote host by exporting env vars below:
+eval $(docker-machine env machine-name)
+
+export DOCKER_TLS_VERIFY="1"
+export DOCKER_HOST="tcp://159.203.134.165:2376"
+export DOCKER_CERT_PATH="/Users/aregsarkissian/.docker/machine/machines/docker-server-1"
+export DOCKER_MACHINE_NAME="docker-server-1
+
+#
+#exit remote host by unsetting env vars below:
+eval $(docker-machine env -u)
+
+#unset DOCKER_TLS_VERIFY
+#unset DOCKER_HOST
+#unset DOCKER_CERT_PATH
+#unset DOCKER_MACHINE_NAME
+
+
+======================================
+#inspecting the docker machine
+ docker-machine ls
+
+ docker-machine inspect docker-server-1
+
+ docker-machine config docker-server-1
+
+ docker-machine ip docker-server-1
+
+ docker-machine start docker-server-1
+ 
+ docker-machine stop docker-server-1
+
+
+==================================
+ #ssh into machine
+ docker-machine ssh machine-name
+
+ #exit ssh session
+ exit
+
+ #run commands via ssh
+ docker-machine ssh machine-name apt-get update
+
+ docker-machine ssh machine-name apt-get upgrade
+
+ docker-machine ssh machine-name uname -r
+
+
+
+==============================
+
+docker-machine inspect docker-server-1
+
+ "AuthOptions": {
+            "CertDir": "/Users/aregsarkissian/.docker/machine/certs",
+            "CaCertPath": "/Users/aregsarkissian/.docker/machine/certs/ca.pem",
+            "CaPrivateKeyPath": "/Users/aregsarkissian/.docker/machine/certs/ca-key.pem",
+            "CaCertRemotePath": "",
+            "ServerCertPath": "/Users/aregsarkissian/.docker/machine/machines/docker-server-1/server.pem",
+            "ServerKeyPath": "/Users/aregsarkissian/.docker/machine/machines/docker-server-1/server-key.pem",
+            "ClientKeyPath": "/Users/aregsarkissian/.docker/machine/certs/key.pem",
+            "ServerCertRemotePath": "",
+            "ServerKeyRemotePath": "",
+            "ClientCertPath": "/Users/aregsarkissian/.docker/machine/certs/cert.pem",
+            "ServerCertSANs": [],
+            "StorePath": "/Users/aregsarkissian/.docker/machine/machines/docker-server-1"
+        }
+
+"Driver": {
+        "IPAddress": "104.236.190.208",
+        "MachineName": "docker-server-1",
+        "SSHUser": "root",
+        "SSHPort": 22,
+        "SSHKeyPath": "/Users/aregsarkissian/.docker/machine/machines/docker-server-1/id_rsa",
+        "StorePath": "/Users/aregsarkissian/.docker/machine",
+
+
+
+
+=======================================
+#DO api
+
+#get region info
+curl -X GET \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer 2b15fab79eb17225c1b90cfa399b615a0a11b3dc2cf6d72aed911c452b550282" \ 
+"https://api.digitalocean.com/v2/regions"
+
+#create a droplet
+curl -X POST 
+-H "Content-Type: application/json" 
+-H "Authorization: Bearer 2b15fab79eb17225c1b90cfa399b615a0a11b3dc2cf6d72aed911c452b550282" 
+-d '{"name":"example.com"
+,"region":"sfo1"
+,"size":"512mb"
+,"image":"ubuntu-14-04-x64"
+,"ssh_keys":null
+,"backups":false
+,"ipv6":true
+,"user_data":null
+,"private_networking":true
+,"volumes": null
+,"tags":["web"]}' \
+"https://api.digitalocean.com/v2/droplets"
